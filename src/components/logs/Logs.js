@@ -22,7 +22,7 @@ const Logs = ({ log: { logs, loading }, getLogs }) => {
       </li>
       {!loading && logs.length === 0 ? (
         <li>
-          <p>No logs to show...</p>
+          <p style={{ textAlign: "center" }}>No logs to show...</p>
         </li>
       ) : (
         logs.map((log) => <LogItem key={log.id} log={log} />)
@@ -33,6 +33,7 @@ const Logs = ({ log: { logs, loading }, getLogs }) => {
 
 Logs.propType = {
   log: PropTypes.object.isRequired,
+  getLogs: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => ({

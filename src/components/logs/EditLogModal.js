@@ -1,16 +1,38 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import TechSelectOption from "../techs/TechSelectOptions";
+import { connect } from "react-redux";
+import PropTypes from "prop-types";
+import { updateLog } from "../../actions/logActions";
 import M from "materialize-css/dist/js/materialize.min.js";
 
-const EditLogModal = () => {
+const EditLogModal = ({ current, updateLog }) => {
   const [message, setMessage] = useState("");
   const [attention, setAttention] = useState(false);
   const [tech, setTech] = useState("");
+
+  useEffect(() => {
+    if (current) {
+      setMessage(current.message);
+      setAttention(current.attention);
+      setTech(current.tech);
+    }
+  }, [current]);
 
   const onSubmit = () => {
     if (message === "" || tech === "") {
       M.toast({ html: "Please enter a message or tech" });
     } else {
-      console.log(message, tech, attention);
+      // console.log(message, tech, attention);
+      const updLog = {
+        id: current.id,
+        message,
+        attention,
+        tech,
+        date: new Date(),
+      };
+
+      updateLog(updLog);
+      M.toast({ html: `Log updated by ${tech}` });
     }
 
     clearState();
@@ -35,9 +57,9 @@ const EditLogModal = () => {
               value={message}
               onChange={(e) => setMessage(e.target.value)}
             />
-            <label htmlFor="message" className="active">
+            {/* <label htmlFor="message" className="active">
               Log Message
-            </label>
+            </label> */}
           </div>
         </div>
         <div className="row">
@@ -51,9 +73,7 @@ const EditLogModal = () => {
               <option value="" disabled>
                 Select Technician
               </option>
-              <option value="John Doe">John Doe</option>
-              <option value="Sam Smith">Sam Smith</option>
-              <option value="Sara Wilson">Sara Wilson</option>
+              <TechSelectOption />
             </select>
           </div>
         </div>
@@ -87,9 +107,18 @@ const EditLogModal = () => {
   );
 };
 
+EditLogModal.propTypes = {
+  current: PropTypes.object,
+  updateLog: PropTypes.func.isRequired,
+};
+
 const modalStyle = {
   width: "75%",
   height: "75%",
 };
 
-export default EditLogModal;
+const mapStateToProps = (state) => ({
+  current: state.log.current,
+});
+
+export default connect(mapStateToProps, { updateLog })(EditLogModal);
